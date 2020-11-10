@@ -8,22 +8,22 @@ function! s:get_metadata() abort
 endfunction
 
 function! s:datermine(context) abort
-  let [l:_, l:keyword_pattern_offset, l:__] = matchstrpos(a:context.before_line, '[[:alnum:]!$&*\-_=+:<>./?]\+$')
-  if l:keyword_pattern_offset > 0
+  let l:offset = compe#pattern#get_offset(a:context, '[[:alnum:]!$&*\-_=+:<>./?]\+$')
+  if l:offset > 0
     return {
-    \   'keyword_pattern_offset': l:keyword_pattern_offset
+    \   'keyword_pattern_offset': l:offset
     \ }
   end
   return {}
 endfunction
 
-function! s:complete(context) abort
+function! s:complete(args) abort
   if !iced#repl#is_connected()
-    return
+    return a:args.abort()
   endif
 
   if !iced#nrepl#check_session_validity(v:false)
-    return
+    return a:args.abort()
   endif
 
   call iced#complete#candidates(a:args.input, { candidates ->
@@ -40,6 +40,3 @@ let s:source = {
 \ }
 
 call compe#source#vim_bridge#register('iced', s:source)
-
-let &cpoptions= s:save_cpo
-unlet s:save_cpo
