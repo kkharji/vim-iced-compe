@@ -39,4 +39,4 @@ let s:source = {
 \   'complete': function('s:complete'),
 \ }
 
-call compe#source#vim_bridge#register('iced', s:source)
+call compe#register_source('iced', s:source)
