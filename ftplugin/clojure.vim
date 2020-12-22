@@ -3,12 +3,17 @@ if exists('g:loaded_vim_iced_compe')
 endif
 let g:loaded_vim_iced_compe = 1
 
+function! s:get_offset(context, pattern) abort
+  let [l:_, l:offset, l:__] = matchstrpos(a:context.before_line, a:pattern)
+  return l:offset + 1
+endfunction
+
 function! s:get_metadata() abort
   return { 'priority': 1000, 'dup': 1, 'filetypes': ['clojure'] }
 endfunction
 
 function! s:datermine(context) abort
-  let l:offset = compe#pattern#get_offset(a:context, '[[:alnum:]!$&*\-_=+:<>./?]\+$')
+  let l:offset = s:get_offset(a:context,  '[[:alnum:]!$&*\-_=+:<>./?]\+$')
   if l:offset > 0
     return {
     \   'keyword_pattern_offset': l:offset,
@@ -39,6 +44,8 @@ function! s:documentation(args) abort
   if empty(get(l:completed_item, 'info', ''))
     return a:args.abort()
   endif
+  " echo split(l:completed_item.info, "\n", v:true) 
+  " " FIXME: Sometime documentation doesn't trigger
   call a:args.callback(split(l:completed_item.info, "\n", v:true))
 endfunction
 
